@@ -1,9 +1,19 @@
-#!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+'''
+OpenTable.py
+
+•Opentable dataset downloaded from https://www.opentable.com/state-of-industry
+•Filtered dataframe into separate cities, states and countries
+•Plotted time-series data for countries as well as various cities/states in the US
+•Created two functions:
+    resv_plot: plots time series data from a specific city/state/country to show changes in reservations from the previous year
+    usa_plotter: accepts a specific month/day as an argument and returns the reservation data for each US state as a choropleth map.
 
 
+'''
+
+#importing libraries for the analysis
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -24,7 +34,8 @@ states.describe() #row indices are states, columns are dates of OpenTable data
 resv.Type.value_counts() #Breakdown of number of cities, states, and countries OpenTable Collected data on
 
 
-
+#plotting a single state's time-series reservation data
+#The np.array in the plot is a dotted zero line, indicating no changes in reservations year-over-year.
 plt.figure(figsize = (15,10))
 plt.plot(np.transpose(states[states.Name=='Maryland'])[2:],'bo:',np.array([0 for zero in range(len(np.transpose(states[states.Name =='Maryland'])[2:]))]),
          'k--',) #Using the transpose so reservation dates become rows
@@ -36,7 +47,7 @@ plt.ylabel('Change in Reservations YOY (percent)',fontsize = 18)
 plt.figtext(0.5, 0.04, 'Source: opentable.com/state-of-industry', wrap=True, horizontalalignment='center', fontsize=12)
 plt.show()
 
-
+#plotting the time series data for four countries.
 usa = country[country.Name == 'United States']
 uk = country[country.Name == 'United Kingdom']
 ger = country[country.Name =='Germany']
@@ -54,7 +65,7 @@ plt.ylabel('Percent change from pervious year',fontsize = 18)
 plt.figtext(0.5, 0.04, 'Source: opentable.com/state-of-industry', wrap=True, horizontalalignment='center', fontsize=12)
 plt.show()
 
-
+#Filtering time series data for various US cities
 hou = np.transpose(city[city.Name == 'Houston'])[2:]
 bal = np.transpose(city[city.Name == 'Baltimore'])[2:]
 nyc = np.transpose(city[city.Name == 'New York'])[2:]
@@ -64,7 +75,7 @@ la = np.transpose(city[city.Name == 'Los Angeles'])[2:]
 no = np.transpose(city[city.Name == 'New Orleans'])[2:]
 
 
-
+#Plotting the time series data using lines 69-75
 plt.figure(figsize = (15,10))
 plt.plot(hou,'bo:',mia,'ro:',nyc,'go:',sea,'yo:',no,'ko:',
          la,'mo:',
@@ -81,6 +92,7 @@ plt.figtext(0.5, 0.04, 'Source: opentable.com/state-of-industry', wrap=True, hor
 plt.show()
 
 
+#Filtering time series data for various US states
 tx = np.transpose(states[states.Name == 'Texas'])[2:]
 pa = np.transpose(states[states.Name == 'Pennsylvania'])[2:]
 ny = np.transpose(states[states.Name == 'New York'])[2:]
@@ -90,7 +102,7 @@ ca = np.transpose(states[states.Name == 'California'])[2:]
 az = np.transpose(states[states.Name == 'Arizona'])[2:]
 
 
-
+#Plotting the time series data using lines 96-102
 plt.figure(figsize = (15,10))
 plt.plot(tx,'bo:',pa,'ro:',ny,'go:',ore,'yo:',fl,'ko:',
          ca,'mo:', az,'co:',
@@ -133,18 +145,18 @@ def resv_plot(land,name):  #land is either a city, state or country. Name is the
 
 resv_plot('city','Baltimore')
 
-
+#Importing geopandas and axes libraries to make US map for choropleth
 import geopandas as gpd
 from shapely.geometry import Point, Polygon
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 united_states = gpd.read_file('/Users/pizac/Downloads/states_21basic/states.shp')
 
 
-
+#Merging .shp file with states dataframe using the state name to merge the two
 map_plot = united_states.merge(states.loc[:,['Name',states.columns[-1]]],left_on = 'STATE_NAME', right_on = 'Name')
 
 
-
+#Plotting the states' reservation percentages for the most recent day given in the dataset
 fig, ax = plt.subplots(1,figsize = (25,15),facecolor = 'lightblue')
 ax.set_axis_off()
 ax.set_title('States Year-Over-Year Changes in Reservations on {}/20'.format(map_plot.columns[-1]),fontsize = 30,fontweight = 'bold',fontname = 'Comic Sans MS')
@@ -157,7 +169,7 @@ plt.show()
 
 
 
-
+#Plots the states' reservation percentages on whichever date is provided as the argument
 def usa_plotter(date): #day argument selects the column of OpenTable data for that respective month/day of 2020 
     import geopandas as gpd
     from shapely.geometry import Point, Polygon
