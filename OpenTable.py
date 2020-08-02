@@ -39,12 +39,12 @@ resv.Type.value_counts() #Breakdown of number of cities, states, and countries O
 plt.figure(figsize = (15,10))
 plt.plot(np.transpose(states[states.Name=='Maryland'])[2:],'bo:',np.array([0 for zero in range(len(np.transpose(states[states.Name =='Maryland'])[2:]))]),
          'k--',) #Using the transpose so reservation dates become rows
-plt.xticks(states[states.Name=='Maryland'].columns[2::7],fontsize = 12) #Separating the xticks by week to make less cluttered
+plt.xticks(states[states.Name=='Maryland'].columns[2::14],fontsize = 12) #Separating the xticks by 14-day increments to make less cluttered
 plt.yticks(fontsize = 12)
 plt.title("Maryland's Year-over-Year Change in Reservations",fontsize = 30,fontweight = 'bold')
 plt.xlabel('Month/day in 2020', fontsize = 18)
 plt.ylabel('Change in Reservations YOY (percent)',fontsize = 18)
-plt.figtext(0.5, 0.04, 'Source: opentable.com/state-of-industry', wrap=True, horizontalalignment='center', fontsize=12)
+plt.figtext(0.5, 0.008, 'Source: opentable.com/state-of-industry', wrap=True, horizontalalignment='center', fontsize=12)
 plt.show()
 
 #plotting the time series data for four countries.
@@ -56,13 +56,13 @@ plt.figure(figsize = (15,10))
 plt.plot(np.transpose(usa)[2:],'bo:',np.transpose(uk)[2:],'go:',np.transpose(ger)[2:],'yo:',np.transpose(can)[2:],'ro:',
          np.array([0 for zero in range(len(np.transpose(country[country.Name =='United Kingdom'])[2:]))]),
          'k--',alpha = 0.6)
-plt.xticks(usa.columns[2::7],fontsize = 12)
+plt.xticks(usa.columns[2::14],fontsize = 12)
 plt.yticks(fontsize = 12)
 plt.title('Country Changes in Reservations Year-over-Year',fontsize = 30, fontweight = 'bold')
 plt.legend(('USA','United Kingdom','Germany','Canada'),loc = 'upper left',fontsize = 12)
 plt.xlabel('Month/Day in Year 2020',fontsize = 18)
 plt.ylabel('Percent change from pervious year',fontsize = 18)
-plt.figtext(0.5, 0.04, 'Source: opentable.com/state-of-industry', wrap=True, horizontalalignment='center', fontsize=12)
+plt.figtext(0.5, 0.008, 'Source: opentable.com/state-of-industry', wrap=True, horizontalalignment='center', fontsize=12)
 plt.show()
 
 #Filtering time series data for various US cities
@@ -81,14 +81,13 @@ plt.plot(hou,'bo:',mia,'ro:',nyc,'go:',sea,'yo:',no,'ko:',
          la,'mo:',
          np.array([0 for zero in range(len(np.transpose(city[city.Name =='Baltimore'])[2:]))]),
          'k--',alpha = 0.52)
-plt.xticks(usa.columns[2::7],fontsize = 12)
-plt.xticks(usa.columns[2::7],fontsize = 12)
+plt.xticks(usa.columns[2::14],fontsize = 12)
 plt.yticks(fontsize = 12)
 plt.title('City Changes in Reservations Year-over-Year',fontsize = 30, fontweight = 'bold')
 plt.legend(('Houston','Miami','New York City','Seattle','New Orleans','Los Angeles'),loc = 'upper right')
 plt.xlabel('Month/Day in Year 2020',fontsize = 18)
 plt.ylabel('Percent change from pervious year',fontsize = 18)
-plt.figtext(0.5, 0.04, 'Source: opentable.com/state-of-industry', wrap=True, horizontalalignment='center', fontsize=12)
+plt.figtext(0.5, 0.008, 'Source: opentable.com/state-of-industry', wrap=True, horizontalalignment='center', fontsize=12)
 plt.show()
 
 
@@ -108,14 +107,13 @@ plt.plot(tx,'bo:',pa,'ro:',ny,'go:',ore,'yo:',fl,'ko:',
          ca,'mo:', az,'co:',
          np.array([0 for zero in range(len(np.transpose(city[city.Name =='Baltimore'])[2:]))]),
          'k--',alpha = 0.49)
-plt.xticks(usa.columns[2::7],fontsize = 12)
-plt.xticks(usa.columns[2::7],fontsize = 12)
+plt.xticks(usa.columns[2::14],fontsize = 12)
 plt.yticks(fontsize = 12)
 plt.title('State Changes in Reservations Year-over-Year',fontsize = 30, fontweight = 'bold',fontname = 'Times New Roman')
 plt.legend(('Texas','Pennsylvania','New York','Oregon','Florida','California', 'Arizona'),loc = 'upper right')
 plt.xlabel('Month/Day in Year 2020',fontsize = 18, fontname = 'Times New Roman')
 plt.ylabel('Percent change from pervious year',fontsize = 18,fontname = 'Times New Roman')
-plt.figtext(0.51, 0.04, 'Source: opentable.com/state-of-industry', wrap=True, horizontalalignment='center', fontsize=12)
+plt.figtext(0.51, 0.008, 'Source: opentable.com/state-of-industry', wrap=True, horizontalalignment='center', fontsize=12)
 plt.show()
 
 
@@ -131,12 +129,12 @@ def resv_plot(land,name):  #land is either a city, state or country. Name is the
         try:
             plt.figure(figsize = (15,10))
             plt.plot(np.transpose(n)[2:],'o:' ,np.array([0 for zero in range(len(np.transpose(n)[2:]))]),'k:')
-            plt.xticks(geo.columns[2::7],fontsize = 12)
+            plt.xticks(geo.columns[2::14],fontsize = 12)
             plt.yticks(fontsize = 12)
             plt.title('{} Changes in Reservations Year-over-Year'.format(name),fontsize = 30, fontweight = 'bold')
             plt.xlabel('Month/Day in Year 2020',fontsize = 18)
             plt.ylabel('Percent change from pervious year',fontsize = 18)
-            plt.figtext(0.5, 0.04, 'Source: opentable.com/state-of-industry', wrap=True, horizontalalignment='center', fontsize=12)
+            plt.figtext(0.5, 0.008, 'Source: opentable.com/state-of-industry', wrap=True, horizontalalignment='center', fontsize=12)
             plt.show()
         except ZeroDivisionError:
             print('{} is not in the OpenTable dataset'.format(land.capitalize()))
