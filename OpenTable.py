@@ -51,15 +51,16 @@ plt.show()
 usa = country[country.Name == 'United States']
 uk = country[country.Name == 'United Kingdom']
 ger = country[country.Name =='Germany']
+ire = country[country.Name =='Ireland']
 can = country[country.Name =='Canada']
 plt.figure(figsize = (15,10))
-plt.plot(np.transpose(usa)[2:],'bo:',np.transpose(uk)[2:],'go:',np.transpose(ger)[2:],'yo:',np.transpose(can)[2:],'ro:',
+plt.plot(np.transpose(usa)[2:],'bo:',np.transpose(uk)[2:],'go:',np.transpose(ger)[2:],'yo:',np.transpose(ire)[2:],'mo:',np.transpose(can)[2:],'ro:',
          np.array([0 for zero in range(len(np.transpose(country[country.Name =='United Kingdom'])[2:]))]),
          'k--',alpha = 0.6)
 plt.xticks(usa.columns[2::14],fontsize = 12)
 plt.yticks(fontsize = 12)
 plt.title('Country Changes in Reservations Year-over-Year',fontsize = 30, fontweight = 'bold')
-plt.legend(('USA','United Kingdom','Germany','Canada'),loc = 'upper left',fontsize = 12)
+plt.legend(('USA','United Kingdom','Germany','Ireland','Canada'),loc = 'upper left',fontsize = 12)
 plt.xlabel('Month/Day in Year 2020',fontsize = 18)
 plt.ylabel('Percent change from pervious year',fontsize = 18)
 plt.figtext(0.5, 0.008, 'Source: opentable.com/state-of-industry', wrap=True, horizontalalignment='center', fontsize=12)
