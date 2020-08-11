@@ -13,7 +13,7 @@ OpenTable.py
 
 '''
 
-#importing libraries for the analysis
+#importing libraries for the analyses
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -27,92 +27,107 @@ states= resv[resv.Type == 'state']
 city = resv[resv.Type == 'city']
 
 
-states.describe() #row indices are states, columns are dates of OpenTable data
+#row indices are states, columns are dates of OpenTable data
 
 
 
-resv.Type.value_counts() #Breakdown of number of cities, states, and countries OpenTable Collected data on
+print(resv.Type.value_counts()) #Breakdown of number of cities, states, and countries OpenTable Collected data on
 
 
 #plotting a single state's time-series reservation data
 #The np.array in the plot is a dotted zero line, indicating no changes in reservations year-over-year.
-plt.figure(figsize = (15,10))
-plt.plot(np.transpose(states[states.Name=='Maryland'])[2:],'bo:',np.array([0 for zero in range(len(np.transpose(states[states.Name =='Maryland'])[2:]))]),
-         'k--',) #Using the transpose so reservation dates become rows
-plt.xticks(states[states.Name=='Maryland'].columns[2::14],fontsize = 12) #Separating the xticks by 14-day increments to make less cluttered
-plt.yticks(fontsize = 12)
-plt.title("Maryland's Year-over-Year Change in Reservations",fontsize = 30,fontweight = 'bold')
-plt.xlabel('Month/day in 2020', fontsize = 18)
-plt.ylabel('Change in Reservations YOY (percent)',fontsize = 18)
-plt.figtext(0.5, 0.008, 'Source: opentable.com/state-of-industry', wrap=True, horizontalalignment='center', fontsize=12)
-plt.show()
+
 
 #plotting the time series data for four countries.
-usa = country[country.Name == 'United States']
-uk = country[country.Name == 'United Kingdom']
-ger = country[country.Name =='Germany']
-ire = country[country.Name =='Ireland']
-can = country[country.Name =='Canada']
+def country_cleaning(name):
+    country_data = np.transpose(country[country.Name == name])[2:].reset_index()
+    country_data.columns = ['date','reservations']
+    country_data.date = pd.to_datetime(country_data.date+'/2020')
+    country_data.reservations = country_data.reservations.astype(float)
+    return country_data
+
+usa,uk,ger = country_cleaning('United States'),country_cleaning('United Kingdom'),country_cleaning('Germany')
+ire,can = country_cleaning('Ireland'),country_cleaning('Canada')
+
+
+
 plt.figure(figsize = (15,10))
-plt.plot(np.transpose(usa)[2:],'bo:',np.transpose(uk)[2:],'go:',np.transpose(ger)[2:],'yo:',np.transpose(ire)[2:],'mo:',np.transpose(can)[2:],'ro:',
-         np.array([0 for zero in range(len(np.transpose(country[country.Name =='United Kingdom'])[2:]))]),
-         'k--',alpha = 0.6)
-plt.xticks(usa.columns[2::14],fontsize = 12)
+plt.plot(usa.date,usa.reservations,'bo:',alpha = 0.6)
+plt.plot(uk.date,uk.reservations,'go:',alpha = 0.6)
+plt.plot(ger.date,ger.reservations,'yo:',alpha = 0.6)
+plt.plot(ire.date,ire.reservations,'mo:',alpha = 0.6)
+plt.plot(can.date,can.reservations,'ro:',alpha = 0.6)
+plt.plot(usa.date, np.array([0 for zero in range(len(usa.date))]),'k--',alpha = 0.6)
+plt.xticks(fontsize = 12)
 plt.yticks(fontsize = 12)
 plt.title('Country Changes in Reservations Year-over-Year',fontsize = 30, fontweight = 'bold')
 plt.legend(('USA','United Kingdom','Germany','Ireland','Canada'),loc = 'upper left',fontsize = 12)
-plt.xlabel('Month/Day in Year 2020',fontsize = 18)
+plt.xlabel('Year-Month',fontsize = 18)
 plt.ylabel('Percent change from pervious year',fontsize = 18)
 plt.figtext(0.5, 0.008, 'Source: opentable.com/state-of-industry', wrap=True, horizontalalignment='center', fontsize=12)
 plt.show()
 
 #Filtering time series data for various US cities
-hou = np.transpose(city[city.Name == 'Houston'])[2:]
-bal = np.transpose(city[city.Name == 'Baltimore'])[2:]
-nyc = np.transpose(city[city.Name == 'New York'])[2:]
-sea = np.transpose(city[city.Name == 'Seattle'])[2:]
-mia = np.transpose(city[city.Name == 'Miami'])[2:]
-la = np.transpose(city[city.Name == 'Los Angeles'])[2:]
-no = np.transpose(city[city.Name == 'New Orleans'])[2:]
+def city_cleaning(name):
+    city_data = np.transpose(city[city.Name == name])[2:].reset_index()
+    city_data.columns = ['date','reservations']
+    city_data.date = pd.to_datetime(city_data.date+'/2020')
+    city_data.reservations = city_data.reservations.astype(float)
+    return city_data
+
+hou,bal,nyc = city_cleaning('Houston'),city_cleaning('Baltimore'),city_cleaning('New York')
+sea,mia,la,no = city_cleaning('Seattle'),city_cleaning('Miami'),city_cleaning('Los Angeles'),city_cleaning('New Orleans')
 
 
-#Plotting the time series data using lines 69-75
+
+#Plotting the time series data for various US Cities
 plt.figure(figsize = (15,10))
-plt.plot(hou,'bo:',mia,'ro:',nyc,'go:',sea,'yo:',no,'ko:',
-         la,'mo:',
-         np.array([0 for zero in range(len(np.transpose(city[city.Name =='Baltimore'])[2:]))]),
+plt.plot(hou.date,hou.reservations,'bo:',alpha =0.6)
+plt.plot(mia.date,mia.reservations,'ro:',alpha = 0.6)
+plt.plot(nyc.date,nyc.reservations,'go:', alpha = 0.6)
+plt.plot(sea.date,sea.reservations,'yo:', alpha = 0.6)
+plt.plot(no.date,no.reservations,'ko:', alpha = 0.6)
+plt.plot(la.date,la.reservations,'mo:', alpha = 0.6)
+plt.plot(hou.date,np.array([0 for zero in range(len(hou.date))]),
          'k--',alpha = 0.52)
-plt.xticks(usa.columns[2::14],fontsize = 12)
+plt.xticks(fontsize = 12)
 plt.yticks(fontsize = 12)
 plt.title('City Changes in Reservations Year-over-Year',fontsize = 30, fontweight = 'bold')
 plt.legend(('Houston','Miami','New York City','Seattle','New Orleans','Los Angeles'),loc = 'upper right')
-plt.xlabel('Month/Day in Year 2020',fontsize = 18)
+plt.xlabel('Year-Month',fontsize = 18)
 plt.ylabel('Percent change from pervious year',fontsize = 18)
 plt.figtext(0.5, 0.008, 'Source: opentable.com/state-of-industry', wrap=True, horizontalalignment='center', fontsize=12)
 plt.show()
 
 
 #Filtering time series data for various US states
-tx = np.transpose(states[states.Name == 'Texas'])[2:]
-pa = np.transpose(states[states.Name == 'Pennsylvania'])[2:]
-ny = np.transpose(states[states.Name == 'New York'])[2:]
-ore = np.transpose(states[states.Name == 'Oregon'])[2:]
-fl = np.transpose(states[states.Name == 'Florida'])[2:]
-ca = np.transpose(states[states.Name == 'California'])[2:]
-az = np.transpose(states[states.Name == 'Arizona'])[2:]
+def state_cleaning(name):
+    state_data = np.transpose(states[states.Name == name])[2:].reset_index()
+    state_data.columns = ['date','reservations']
+    state_data.date = pd.to_datetime(state_data.date+'/2020')
+    state_data.reservations = state_data.reservations.astype(float)
+    return state_data
+tx,pa,ny,ore, = state_cleaning('Texas'),state_cleaning('Pennsylvania'),state_cleaning('New York'),state_cleaning('Oregon')
+fl,ca,az = state_cleaning('Florida'),state_cleaning('California'),state_cleaning('Arizona')
 
 
-#Plotting the time series data using lines 96-102
+
+#Plotting the time series data for various US states
 plt.figure(figsize = (15,10))
-plt.plot(tx,'bo:',pa,'ro:',ny,'go:',ore,'yo:',fl,'ko:',
-         ca,'mo:', az,'co:',
-         np.array([0 for zero in range(len(np.transpose(city[city.Name =='Baltimore'])[2:]))]),
+plt.plot(tx.date,tx.reservations,'bo:',alpha = 0.49)
+plt.plot(pa.date,pa.reservations,'ro:',alpha = 0.49)
+plt.plot(ny.date,ny.reservations,'go:',alpha = 0.49)
+plt.plot(ore.date,ore.reservations,'yo:',alpha = 0.49)
+plt.plot(fl.date,fl.reservations,'ko:',alpha = 0.49)
+plt.plot(ca.date,ca.reservations,'mo:',alpha = 0.49)
+plt.plot(az.date,az.reservations,'co:',alpha = 0.49)
+plt.plot(tx.date,np.array([0 for zero in range(len(tx.date))]),
          'k--',alpha = 0.49)
-plt.xticks(usa.columns[2::14],fontsize = 12)
+plt.xticks(fontsize = 12)
 plt.yticks(fontsize = 12)
 plt.title('State Changes in Reservations Year-over-Year',fontsize = 30, fontweight = 'bold',fontname = 'Times New Roman')
 plt.legend(('Texas','Pennsylvania','New York','Oregon','Florida','California', 'Arizona'),loc = 'upper right')
-plt.xlabel('Month/Day in Year 2020',fontsize = 18, fontname = 'Times New Roman')
+plt.xlabel('Year-Month',fontsize = 18, fontname = 'Times New Roman')
 plt.ylabel('Percent change from pervious year',fontsize = 18,fontname = 'Times New Roman')
 plt.figtext(0.51, 0.008, 'Source: opentable.com/state-of-industry', wrap=True, horizontalalignment='center', fontsize=12)
 plt.show()
@@ -125,15 +140,19 @@ def resv_plot(land,name):  #land is either a city, state or country. Name is the
     if land not in ['city','state','country']:
         print('land argument must be either: city, state or country and formatted as a string')
     else:
-        n = geo[geo.Name == name]
+        n = np.transpose(geo[geo.Name == name])[2:].reset_index()
+        n.columns = ['date','reservations']
+        n.date = pd.to_datetime(n.date+'/2020')
+        n.reservations = n.reservations.astype(float)
         
         try:
             plt.figure(figsize = (15,10))
-            plt.plot(np.transpose(n)[2:],'o:' ,np.array([0 for zero in range(len(np.transpose(n)[2:]))]),'k:')
-            plt.xticks(geo.columns[2::14],fontsize = 12)
+            plt.plot(n.date,n.reservations,'o:')
+            plt.plot(n.date,np.array([0 for zero in range(len(n.date))]),'k:')
+            plt.xticks(fontsize = 12)
             plt.yticks(fontsize = 12)
             plt.title('{} Changes in Reservations Year-over-Year'.format(name),fontsize = 30, fontweight = 'bold')
-            plt.xlabel('Month/Day in Year 2020',fontsize = 18)
+            plt.xlabel('Year-Month',fontsize = 18)
             plt.ylabel('Percent change from pervious year',fontsize = 18)
             plt.figtext(0.5, 0.008, 'Source: opentable.com/state-of-industry', wrap=True, horizontalalignment='center', fontsize=12)
             plt.show()
