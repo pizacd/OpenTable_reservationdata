@@ -158,7 +158,7 @@ map_plot = united_states.merge(states.loc[:,['Name',states.columns[-1]]],left_on
 #Plotting the states' reservation percentages for the most recent day given in the dataset
 fig, ax = plt.subplots(1,figsize = (25,15),facecolor = 'lightblue')
 ax.set_axis_off()
-ax.set_title('States Year-Over-Year Changes in Reservations on {}/20'.format(map_plot.columns[-1]),fontsize = 30,fontweight = 'bold',fontname = 'Comic Sans MS')
+ax.set_title('States Year-Over-Year Changes in Reservations on {}/20'.format(map_plot.columns[-1]),fontsize = 30,fontweight = 'bold',fontname = 'Times New Roman')
 ax.annotate('Source: https://opentable.com/state-of-industry',xy = (0.36,0.25),xycoords='figure fraction', fontname = 'Times New Roman', fontsize=18)
 divider = make_axes_locatable(ax)
 cax = divider.append_axes('right',size = '3%',pad = .05)
