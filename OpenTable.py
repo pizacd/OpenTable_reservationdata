@@ -29,27 +29,22 @@ city = resv[resv.Type == 'city']
 
 #row indices are states, columns are dates of OpenTable data
 
-
-
 print(resv.Type.value_counts()) #Breakdown of number of cities, states, and countries OpenTable Collected data on
-
 
 #plotting a single state's time-series reservation data
 #The np.array in the plot is a dotted zero line, indicating no changes in reservations year-over-year.
 
 
 #plotting the time series data for four countries.
-def country_cleaning(name):
-    country_data = np.transpose(country[country.Name == name])[2:].reset_index()
-    country_data.columns = ['date','reservations']
-    country_data.date = pd.to_datetime(country_data.date+'/2020')
-    country_data.reservations = country_data.reservations.astype(float)
-    return country_data
+def yelp_cleaning(landtype, name):
+    yelp_data = np.transpose(resv.loc[(resv.Type == landtype.lower())&(resv.Name == name.title())])[2:].reset_index()
+    yelp_data.columns = ['date','reservations']
+    yelp_data.date = pd.to_datetime(yelp_data.date+'/2020')
+    yelp_data.reservations = yelp_data.reservations.astype(float)
+    return yelp_data
 
-usa,uk,ger = country_cleaning('United States'),country_cleaning('United Kingdom'),country_cleaning('Germany')
-ire,can = country_cleaning('Ireland'),country_cleaning('Canada')
-
-
+usa,uk,ger = yelp_cleaning('country','United States'),yelp_cleaning('country','United Kingdom'),yelp_cleaning('country','Germany')
+ire,can = yelp_cleaning('country','Ireland'),yelp_cleaning('country','Canada')
 
 plt.figure(figsize = (15,10))
 plt.plot(usa.date,usa.reservations,'bo:',alpha = 0.6)
@@ -68,15 +63,10 @@ plt.figtext(0.5, 0.008, 'Source: opentable.com/state-of-industry', wrap=True, ho
 plt.show()
 
 #Filtering time series data for various US cities
-def city_cleaning(name):
-    city_data = np.transpose(city[city.Name == name])[2:].reset_index()
-    city_data.columns = ['date','reservations']
-    city_data.date = pd.to_datetime(city_data.date+'/2020')
-    city_data.reservations = city_data.reservations.astype(float)
-    return city_data
 
-hou,bal,nyc = city_cleaning('Houston'),city_cleaning('Baltimore'),city_cleaning('New York')
-sea,mia,la,no = city_cleaning('Seattle'),city_cleaning('Miami'),city_cleaning('Los Angeles'),city_cleaning('New Orleans')
+
+hou,bal,nyc = yelp_cleaning('city','Houston'),yelp_cleaning('city','Baltimore'),yelp_cleaning('city','New York')
+sea,mia,la,no = yelp_cleaning('city','Seattle'),yelp_cleaning('city','Miami'),yelp_cleaning('city','Los Angeles'),yelp_cleaning('city','New Orleans')
 
 
 
@@ -101,14 +91,8 @@ plt.show()
 
 
 #Filtering time series data for various US states
-def state_cleaning(name):
-    state_data = np.transpose(states[states.Name == name])[2:].reset_index()
-    state_data.columns = ['date','reservations']
-    state_data.date = pd.to_datetime(state_data.date+'/2020')
-    state_data.reservations = state_data.reservations.astype(float)
-    return state_data
-tx,pa,ny,ore, = state_cleaning('Texas'),state_cleaning('Pennsylvania'),state_cleaning('New York'),state_cleaning('Oregon')
-fl,ca,az = state_cleaning('Florida'),state_cleaning('California'),state_cleaning('Arizona')
+tx,pa,ny,ore, = yelp_cleaning('state','Texas'),yelp_cleaning('state','Pennsylvania'),yelp_cleaning('state','New York'),yelp_cleaning('state','Oregon')
+fl,ca,az = yelp_cleaning('state','Florida'),yelp_cleaning('state','California'),yelp_cleaning('state','Arizona')
 
 
 
@@ -136,14 +120,11 @@ plt.show()
 
 
 def resv_plot(land,name):  #land is either a city, state or country. Name is the city/state/country name to extract data from
-    geo = resv[resv.Type == land]
+    geo = resv[resv.Type == land.lower()]
     if land not in ['city','state','country']:
-        print('land argument must be either: city, state or country and formatted as a string')
+        print("land argument must be either: 'city', 'state' or 'country' and formatted as a string")
     else:
-        n = np.transpose(geo[geo.Name == name])[2:].reset_index()
-        n.columns = ['date','reservations']
-        n.date = pd.to_datetime(n.date+'/2020')
-        n.reservations = n.reservations.astype(float)
+        n = yelp_cleaning(land,name.title())
         
         try:
             plt.figure(figsize = (15,10))
@@ -161,7 +142,7 @@ def resv_plot(land,name):  #land is either a city, state or country. Name is the
         
 
 
-resv_plot('city','Baltimore')
+resv_plot('city','Austin')
 
 #Importing geopandas and axes libraries to make US map for choropleth
 import geopandas as gpd
