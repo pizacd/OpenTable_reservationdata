@@ -1,13 +1,11 @@
 '''
-OpenTable.py
-
 •Opentable dataset downloaded from https://www.opentable.com/state-of-industry
 •Filtered dataframe into separate cities, states and countries
 •Plotted time-series data for countries as well as various cities/states in the US
 
 •Created three functions:
-	yelp_cleaing: helper function to clean datatypes and prepare values for plotting.
-    resv_plot: plots time series data from a specific city/state/country to show changes in reservations from the previous year
+	yelp_cleaning: helper function to clean datatypes and prepare values for plotting.
+    resv_plot: plots time series data from a specific city/state/country to show YoY changes in reservations.
     usa_plotter: accepts a specific month/day as an argument and returns the reservation data as a choropleth map.
 
 
@@ -37,7 +35,7 @@ def yelp_cleaning(landtype, name):
 	Converts date columns to rows and makes datetime type
 	Converts reservation values from objects to type float
 
-	Arguments:
+	Args:
 		landtype: Either "city","state", or "country"
 		name: calls data for specific area. EX: 'Texas', 'Germany'
 	"""
@@ -132,7 +130,7 @@ def resv_plot(land,name):
 	"""
 	Returns an individual line plot for a specific city, state or country.
 
-	Arguemnts:
+	Args:
 		land is either a city, state or country. 
 		name is the city/state/country name to extract data from
 
@@ -194,7 +192,7 @@ def usa_plotter(date):
 	"""
 	Returns a choropleth map of the USA's reservation percentages YoY on whichever date is provided as the argument.
 
-	Arguments:
+	Args:
 		date: selects the column of OpenTable data for that respective month/day of 2020 
 	"""
 
