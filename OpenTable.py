@@ -4,7 +4,6 @@
 •Plotted time-series data for countries as well as various cities/states in the US
 
 •Created three functions:
-	yelp_cleaning: helper function to clean datatypes and prepare values for plotting.
     resv_plot: plots time series data from a specific city/state/country to show YoY changes in reservations.
     usa_plotter: accepts a specific month/day as an argument and returns the reservation data as a choropleth map.
 
@@ -17,12 +16,17 @@ import matplotlib.pyplot as plt
 import numpy as np
 resv = pd.read_csv('https://raw.githubusercontent.com/pizacd/OpenTable_reservationdata/master/YoY_Seated_Diner_Data.csv')
 
+food =pd.melt(resv,id_vars = ['Name','Type'])
+food.columns= ['Name','LandType','Date','PctChange']
+food.Date = pd.to_datetime(food.Date+'/20')
+food.PctChange=food.PctChange.astype(float)
 
+food.to_excel('resv_cleaned.xlsx',sheet_name = 'OpenTable',index = False)
 #separate dataframe into cities, states and countries
 #Disclaimer: OpenTable did not provide data on all cities, states and countries 
-country = resv[resv.Type=='country']
-states= resv[resv.Type == 'state']
-city = resv[resv.Type == 'city']
+country = food[food.LandType=='country']
+states= food[food.LandType == 'state']
+city = food[food.LandType == 'city']
 
 
 #row indices are cities, countries or states. columns are dates of OpenTable data
@@ -30,35 +34,20 @@ city = resv[resv.Type == 'city']
 print(resv.Type.value_counts()) #Breakdown of number of cities, states, and countries OpenTable Collected data on
 
 
-def yelp_cleaning(landtype, name):
-	"""
-	Converts date columns to rows and makes datetime type
-	Converts reservation values from objects to type float
-
-	Args:
-		landtype: Either "city","state", or "country"
-		name: calls data for specific area. EX: 'Texas', 'Germany'
-	"""
-	
-	yelp_data = np.transpose(resv.loc[(resv.Type == landtype.lower())&(resv.Name == name.title())])[2:].reset_index()
-	yelp_data.columns = ['date','reservations']
-	yelp_data.date = pd.to_datetime(yelp_data.date+'/2020')
-	yelp_data.reservations = yelp_data.reservations.astype(float)
-	return yelp_data
-
-usa,uk,ger = yelp_cleaning('country','United States'),yelp_cleaning('country','United Kingdom'),yelp_cleaning('country','Germany')
-ire,can = yelp_cleaning('country','Ireland'),yelp_cleaning('country','Canada')
+usa,uk = country.loc[country.Name =='United States'],country.loc[country.Name == 'United Kingdom'],
+ger = country.loc[country.Name =='Germany']
+ire,can = country.loc[country.Name =='Ireland'], country.loc[country.Name == 'Canada']
 
 #Lineplot 
 plt.figure(figsize = (15,10))
-plt.plot(usa.date,usa.reservations,'bo:',alpha = 0.6)
-plt.plot(uk.date,uk.reservations,'go:',alpha = 0.6)
-plt.plot(ger.date,ger.reservations,'yo:',alpha = 0.6)
-plt.plot(ire.date,ire.reservations,'mo:',alpha = 0.6)
-plt.plot(can.date,can.reservations,'ro:',alpha = 0.6)
+plt.plot(usa.Date,usa.PctChange,'bo:',alpha = 0.6)
+plt.plot(uk.Date,uk.PctChange,'go:',alpha = 0.6)
+plt.plot(ger.Date,ger.PctChange,'yo:',alpha = 0.6)
+plt.plot(ire.Date,ire.PctChange,'mo:',alpha = 0.6)
+plt.plot(can.Date,can.PctChange,'ro:',alpha = 0.6)
 
 #The np.array in the plot is a dotted zero line, indicating no changes in reservations year-over-year.
-plt.plot(usa.date, np.array([0 for zero in range(len(usa.date))]),'k--',alpha = 0.6)
+plt.plot(usa.Date, np.array([0 for zero in range(len(usa.Date))]),'k--',alpha = 0.6)
 plt.xticks(fontsize = 12)
 plt.yticks(fontsize = 12)
 plt.title('Country Changes in Reservations Year-over-Year',fontsize = 30, fontweight = 'bold')
@@ -72,19 +61,20 @@ plt.show()
 
 #Filtering time series data for various US cities
 
-hou,bal,nyc = yelp_cleaning('city','Houston'),yelp_cleaning('city','Baltimore'),yelp_cleaning('city','New York')
-sea,mia = yelp_cleaning('city','Seattle'),yelp_cleaning('city','Miami')
-La,no = yelp_cleaning('city','Los Angeles'),yelp_cleaning('city','New Orleans')
+hou,bal = city.loc[city.Name == 'Houston'],city.loc[city.Name == 'Baltimore']
+nyc = city.loc[city.Name == 'New York']
+sea,mia = city.loc[city.Name == 'Seattle'], city.loc[city.Name == 'Miami']
+La,no = city.loc[city.Name == 'Los Angeles'],city.loc[city.Name == 'New Orleans']
 
 #Plotting the time series data for various US Cities
 plt.figure(figsize = (15,10))
-plt.plot(hou.date,hou.reservations,'bo:',alpha =0.6)
-plt.plot(mia.date,mia.reservations,'ro:',alpha = 0.6)
-plt.plot(nyc.date,nyc.reservations,'go:', alpha = 0.6)
-plt.plot(sea.date,sea.reservations,'yo:', alpha = 0.6)
-plt.plot(no.date,no.reservations,'ko:', alpha = 0.6)
-plt.plot(La.date,La.reservations,'mo:', alpha = 0.6)
-plt.plot(hou.date,np.array([0 for zero in range(len(hou.date))]),
+plt.plot(hou.Date,hou.PctChange,'bo:',alpha =0.6)
+plt.plot(mia.Date,mia.PctChange,'ro:',alpha = 0.6)
+plt.plot(nyc.Date,nyc.PctChange,'go:', alpha = 0.6)
+plt.plot(sea.Date,sea.PctChange,'yo:', alpha = 0.6)
+plt.plot(no.Date,no.PctChange,'ko:', alpha = 0.6)
+plt.plot(La.Date,La.PctChange,'mo:', alpha = 0.6)
+plt.plot(hou.Date,np.array([0 for zero in range(len(hou.Date))]),
          'k--',alpha = 0.52)
 plt.xticks(fontsize = 12)
 plt.yticks(fontsize = 12)
@@ -97,22 +87,23 @@ plt.show()
 
 
 #Filtering time series data for various US states
-tx, pa = yelp_cleaning('state','Texas'),yelp_cleaning('state','Pennsylvania')
-ny, ore = yelp_cleaning('state','New York'),yelp_cleaning('state','Oregon')
-fl,ca,az = yelp_cleaning('state','Florida'),yelp_cleaning('state','California'),yelp_cleaning('state','Arizona')
+tx, pa = states.loc[states.Name == 'Texas'], states.loc[states.Name == 'Pennsylvania']
+ny, ore = states.loc[states.Name == 'New York'], states.loc[states.Name == 'Oregon']
+fl,ca = states.loc[states.Name == 'Florida'], states.loc[states.Name == 'California']
+az = states.loc[states.Name == 'Arizona'] 
 
 
 
 #Plotting the time series data for various US states
 plt.figure(figsize = (15,10))
-plt.plot(tx.date,tx.reservations,'bo:',alpha = 0.49)
-plt.plot(pa.date,pa.reservations,'ro:',alpha = 0.49)
-plt.plot(ny.date,ny.reservations,'go:',alpha = 0.49)
-plt.plot(ore.date,ore.reservations,'yo:',alpha = 0.49)
-plt.plot(fl.date,fl.reservations,'ko:',alpha = 0.49)
-plt.plot(ca.date,ca.reservations,'mo:',alpha = 0.49)
-plt.plot(az.date,az.reservations,'co:',alpha = 0.49)
-plt.plot(tx.date,np.array([0 for zero in range(len(tx.date))]),
+plt.plot(tx.Date,tx.PctChange,'bo:',alpha = 0.49)
+plt.plot(pa.Date,pa.PctChange,'ro:',alpha = 0.49)
+plt.plot(ny.Date,ny.PctChange,'go:',alpha = 0.49)
+plt.plot(ore.Date,ore.PctChange,'yo:',alpha = 0.49)
+plt.plot(fl.Date,fl.PctChange,'ko:',alpha = 0.49)
+plt.plot(ca.Date,ca.PctChange,'mo:',alpha = 0.49)
+plt.plot(az.Date,az.PctChange,'co:',alpha = 0.49)
+plt.plot(tx.Date,np.array([0 for zero in range(len(tx.Date))]),
          'k--',alpha = 0.49)
 plt.xticks(fontsize = 12)
 plt.yticks(fontsize = 12)
@@ -136,16 +127,16 @@ def resv_plot(land,name):
 
 	"""
 
-	geo = resv[resv.Type == land.lower()]
+	geo = food[food.LandType == land.lower()]
 	if land not in ['city','state','country']:
 	    print("land argument must be either: 'city', 'state' or 'country' and formatted as a string")
 	else:
-	    n = yelp_cleaning(land,name.title())
+	    reserv = geo.loc[geo.Name == name.title()]
 	    
 	    try:
 	        plt.figure(figsize = (15,10))
-	        plt.plot(n.date,n.reservations,'o:')
-	        plt.plot(n.date,np.array([0 for zero in range(len(n.date))]),'k:')
+	        plt.plot(reserv.Date,reserv.PctChange,'o:')
+	        plt.plot(reserv.Date,np.array([0 for zero in range(len(reserv.Date))]),'k:')
 	        plt.xticks(fontsize = 12)
 	        plt.yticks(fontsize = 12)
 	        plt.title('{} Changes in Reservations Year-over-Year'.format(name),fontsize = 30, fontweight = 'bold')
@@ -169,19 +160,19 @@ united_states = gpd.read_file('/Users/pizac/Downloads/states_21basic/states.shp'
 
 
 #Merging .shp file with states dataframe using the state name to merge the two
-map_plot = united_states.merge(states.loc[:,['Name',states.columns[-1]]],left_on = 'STATE_NAME', right_on = 'Name')
-
+map_plot = united_states.merge(states.loc[:,['Name','Date','PctChange']],left_on = 'STATE_NAME', right_on = 'Name')
+map_plot = map_plot.loc[map_plot.Date == map_plot.Date.iloc[-1].date()]
 
 #Plotting the states' reservation percentages for the most recent day given in the dataset
 fig, ax = plt.subplots(1,figsize = (25,15),facecolor = 'lightblue')
 ax.set_axis_off()
-ax.set_title('States Year-Over-Year Changes in Reservations on {}/20'.format(map_plot.columns[-1]),
+ax.set_title('States Year-Over-Year Changes in Reservations on {}'.format(map_plot.Date.iloc[-1].date()),
 	fontsize = 30,fontweight = 'bold',fontname = 'Times New Roman')
 ax.annotate('Source: https://opentable.com/state-of-industry',
 	xy = (0.36,0.25),xycoords='figure fraction', fontname = 'Times New Roman', fontsize=18)
 divider = make_axes_locatable(ax)
 cax = divider.append_axes('right',size = '3%',pad = .05)
-map_plot.dropna().plot(column=map_plot.columns[-1],ax = ax,cax = cax, cmap = 'hot',edgecolor = 'k',   
+map_plot.dropna().plot(column='PctChange',ax = ax,cax = cax, cmap = 'hot',edgecolor = 'k',   
                                   k=4, legend =  True);
 plt.show()
 
@@ -200,14 +191,17 @@ def usa_plotter(date):
 	from shapely.geometry import Point, Polygon
 	from mpl_toolkits.axes_grid1 import make_axes_locatable
 	united_states = gpd.read_file('/Users/pizac/Downloads/states_21basic/states.shp')
-	map_plot = united_states.merge(states.loc[:,['Name',date]],left_on = 'STATE_NAME', right_on = 'Name')
+	map_plot = united_states.merge(states.loc[:,['Name','Date','PctChange']],left_on = 'STATE_NAME', right_on = 'Name')
+	map_plot = map_plot.loc[map_plot.Date == date]
 	fig, ax = plt.subplots(1,figsize = (25,15),facecolor = 'lightblue')
 	ax.set_axis_off()
-	ax.set_title('States Year-Over-Year Changes in Reservations on {}/20'.format(map_plot.columns[-1]),fontsize = 30,fontweight = 'bold',fontname = 'Comic Sans MS')
-	ax.annotate('Source: https://opentable.com/state-of-industry',xy = (0.36,0.25),xycoords='figure fraction', fontname = 'Comic Sans MS', fontsize=18)
+	ax.set_title('States Year-Over-Year Changes in Reservations on {}'.format(map_plot.Date.iloc[-1].date()),
+		fontsize = 30,fontweight = 'bold',fontname = 'Times New Roman')
+	ax.annotate('Source: https://opentable.com/state-of-industry',xy = (0.36,0.25),
+		xycoords='figure fraction', fontname = 'Times New Roman', fontsize=18)
 	divider = make_axes_locatable(ax)
 	cax = divider.append_axes('right',size = '3%',pad = .05)
-	map_plot.dropna().plot(column=map_plot.columns[-1],ax = ax,cax = cax, cmap = 'hot',edgecolor = 'k',   
+	map_plot.dropna().plot(column = 'PctChange',ax = ax,cax = cax, cmap = 'hot',edgecolor = 'k',   
 	                              k=4, legend =  True);
 	plt.show()
 
