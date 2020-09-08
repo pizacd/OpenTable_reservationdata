@@ -21,7 +21,7 @@ food.columns= ['Name','LandType','Date','PctChange']
 food.Date = pd.to_datetime(food.Date+'/20')
 food.PctChange=food.PctChange.astype(float)
 
-food.to_excel('resv_cleaned.xlsx',sheet_name = 'OpenTable',index = False)
+
 #separate dataframe into cities, states and countries
 #Disclaimer: OpenTable did not provide data on all cities, states and countries 
 country = food[food.LandType=='country']
