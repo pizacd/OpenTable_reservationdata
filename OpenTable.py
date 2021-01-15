@@ -156,7 +156,7 @@ resv_plot('city','Austin')
 import geopandas as gpd
 from shapely.geometry import Point, Polygon
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-united_states = gpd.read_file('/Users/pizac/Downloads/states_21basic/states.shp')
+united_states = gpd.read_file('~/Downloads/states_21basic/states.shp')
 
 
 #Merging .shp file with states dataframe using the state name to merge the two
